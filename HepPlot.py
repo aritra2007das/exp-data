@@ -2,7 +2,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.offsetbox import AnchoredText
-import sys, yaml, re
+import sys, yaml, re, os
+import glob
+import subprocess
+
+__all__ = ['point', 'plot_info', 'list_dataset']
 
 class point:
 	__slots__ = ['xl', 'x', 'xh', 'yl', 'y', 'yh', 'syslist', 'stat']
@@ -44,7 +48,17 @@ class point:
 class plot_info:
 	__slots__ = ['plist', 'xlabel', 'ylabel', 'description', 'ylog', 'x', 'y', 'prange']	
 	def __init__(self, fin):
-		with open(fin,'r') as f:    
+		if not os.path.exists(fin):
+			directory = os.path.dirname(sys.modules['HepPlot'].__file__)
+			fin = directory + '/HepPlot/Dmeson/' + fin
+			if not os.path.exists(fin):
+				raise ValueError('dataset '+fin+' not exist')
+			else:
+				print("using stored dataset " + fin)
+		else:
+			print("using dataset " + fin)
+
+		with open(fin, 'r') as f:    
 			ds = yaml.load(f)
 			# unpack x:
 			iv = ds['independent_variables'][0]
@@ -89,11 +103,19 @@ class plot_info:
 		if self.ylog and auto_log:
 			ax.semilogy()
 
+def list_dataset():
+	directory = os.path.dirname(sys.modules['HepPlot'].__file__)
+	print (directory)
+	for folder in glob.glob(directory+'/HepPlot/*'):
+		print(folder,'/','\n')
+		subprocess.call(['ls', folder])
+
 def main():
 	pi = plot_info(sys.argv[1])
 	f, ax = plt.subplots(1,1)
 	color = ['r','g','b','y']
 	alpha = [0.2, 0.3, 0.4, 0.5]
+	
 	for p in pi.plist:
 		ax.errorbar(p.x, p.y,[[-p.stat[0]], [p.stat[1]]], fmt='rD', markersize=5)
 		for it, c, a in zip(p.syslist, color, alpha):
@@ -104,7 +126,7 @@ def main():
 	ax.add_artist(box)
 	pi.recommand_scale(ax)
 	plt.show()
-
+	
 if __name__ == "__main__":
     main()
 
