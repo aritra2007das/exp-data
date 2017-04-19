@@ -3,5 +3,5 @@ Heavy flavor data
 
 Try use the script to plot any dataset in the folder
 
-.. code:: python
+.. code:: 
    ./loaddata.py path/to/the/data
