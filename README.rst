@@ -1,7 +1,13 @@
 Heavy flavor data
 ===============================
 
-Try use the script to plot any dataset in the folder
+First install PyYaml,
+
+.. code::
+
+   sudo pip install pyyaml
+
+Then, use the script to plot any dataset in the folder
 
 .. code::
 
